@@ -1,4 +1,4 @@
-import { Router, NextFunction } from "express";
+import { Router } from "express";
 import UserRoute from "./UserRoute";
 import ProtectedRoute from "./ProtectedRoute";
 

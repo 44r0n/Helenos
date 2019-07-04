@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import moment from "moment";
 import jwt from "jwt-simple";
 import Token from "../entity/Token";
+import IRequest from "../utils/IRequest";
 
 export class UserController {
 
@@ -13,7 +14,7 @@ export class UserController {
         this.repository = userRepository;
     }
 
-    public async Authenticate(req: Request, res: Response, next: NextFunction) {
+    public async Authenticate(req: IRequest, res: Response, next: NextFunction) {
         const token = req.header("Authorization");
         if (token === undefined) {
             res.status(401).json({ message: "No token provided."});
@@ -22,30 +23,32 @@ export class UserController {
 
         try {
             const tokenSplit = token.split(" ");
+            
             if (tokenSplit.length !== 2) {
                 res.status(401).json({ message: "Bad token format." });
                 return;
             }
-
+            
             if (tokenSplit[0] !== "Bearer") {
                 res.status(401).json({ message: "Bad token type."});
                 return;
             }
 
-            const tokenobj: Token = jwt.decode(tokenSplit[1], process.env.JWT_SECRET);
-            const foundUser = await this.repository.findOne({ Id: tokenobj.User });
-
+            
+            const tokenobj: Token = jwt.decode(tokenSplit[1], process.env.JWT_SECRET!);                    
+            const foundUser = await this.repository.findOne({ Id: tokenobj.User });            
+            
             if (foundUser === null || foundUser === undefined) {
                 res.json(404).json({ message: 'User in the token not found.'});
                 return;
             }
-
-            req.user = foundUser;
-            next();
+            
+            req.user = foundUser;            
         } catch(err) {
             res.status(500).json({ message: `Internal server error: ${err}`});
             return;
         }
+        next();
     }
 
     public async Register(req: Request, res: Response) {
@@ -55,13 +58,14 @@ export class UserController {
                 res.status(400).json({ message: errors.toString()});
                 return;
             }
-
+            
             if (await this.repository.findOne({ UserName: req.body.UserName }) !== undefined){
                 res.status(400).json({ message: 'User name already in use'});
                 return;
             }
 
-            const user = this.repository.create(req.body);
+
+            const user = this.repository.create(req.body as User);
             await this.repository.save(user);
             
             res.status(201).json({user: user.Id});
@@ -115,7 +119,7 @@ export class UserController {
         const token = jwt.encode({
             exp: expires,
             User: user.Id,
-        }, process.env.JWT_SECRET);
+        }, process.env.JWT_SECRET!);
 
         return {
             Token: "Bearer " + token,

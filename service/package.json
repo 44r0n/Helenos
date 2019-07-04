@@ -4,9 +4,9 @@
   "description": "Helenos service for registration, authentication and authorization of users.",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
+    "build": "tsc",
     "dev": "ts-node-dev --respawn --transpileOnly ./src/server.ts",
-    "prod": "tsc && node ./build/server.js",
+    "prod": "node ./build/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

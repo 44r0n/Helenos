@@ -4,8 +4,8 @@ services:
     build: ./service
     ports:
       - "3000:3000"
-    volumes:
-      - ./service:/usr/src/app
+    # volumes:
+    #   - ./service:/usr/src/app
   database:
     restart: always
     image: postgres
