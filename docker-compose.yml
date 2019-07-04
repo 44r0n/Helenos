@@ -4,8 +4,10 @@ services:
     build: ./service
     ports:
       - "3000:3000"
-    # volumes:
-    #   - ./service:/usr/src/app
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+    volumes:
+      - ./service:/usr/src/app
   database:
     restart: always
     image: postgres
