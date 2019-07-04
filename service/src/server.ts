@@ -1,6 +1,16 @@
-import express from "express";
-import User from "./entity/User";
-import { getConnection, createConnection } from "typeorm";
+import app from "./app";
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Express server listening on port ${PORT}`);
+});
+
+
+
+// import express from "express";
+// import User from "./entity/User";
+// import { getConnection, createConnection } from "typeorm";
 
 // const app: express.Application = express();
 
@@ -13,16 +23,16 @@ import { getConnection, createConnection } from "typeorm";
 //     console.log("Listening on port 3000");
 // });
 
-async function testInserUser() {
-    const connection = await createConnection();
-    const user = new User();
-    user.UserName = "Pepe";
-    user.Password = "Contra";
-    const repository = connection.getRepository(User);
-    await repository.save(user);
-    console.log('Saved');
-}
+// async function testInserUser() {
+//     const connection = await createConnection();
+//     const user = new User();
+//     user.UserName = "Pepe";
+//     user.Password = "Contra";
+//     const repository = connection.getRepository(User);
+//     await repository.save(user);
+//     console.log('Saved');
+// }
 
-console.log('Launching');
-testInserUser();
-console.log('Lanuched');
+// console.log('Launching');
+// testInserUser();
+// console.log('Lanuched');
