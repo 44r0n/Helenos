@@ -1,8 +1,10 @@
 <template>
     <div>
+        <h1>Hello Decorator Component</h1>
+         <!-- Name: <input v-model="name" type="text">
         <div class="greeting">Hello {{name}}{{exclamationMarks}}</div>
         <button @click="decrement">-</button>
-        <button @click="increment">+</button>
+        <button @click="increment">+</button> -->
     </div>
 </template>
 
