@@ -1,0 +1,27 @@
+{
+  "name": "helenos-web",
+  "version": "1.0.0",
+  "description": "Web for helenos service",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aarón Sánchez",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.1.0",
+    "vue-property-decorator": "^8.2.1"
+  },
+  "devDependencies": {
+    "css-loader": "^3.0.0",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.2",
+    "vue-loader": "^15.7.0",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5"
+  }
+}
