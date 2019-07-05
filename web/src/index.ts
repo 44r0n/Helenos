@@ -2,12 +2,14 @@ import Vue from "vue";
 import VueRouter from 'vue-router'
 import HelloComponent from "./components/Hello.vue";
 import HelloDecoratorComponent from "./components/HelloDecorator.vue";
+import Tutorial from "./components/Tutorial.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
     { path: '/HelloComponent', name: 'HelloComponent', component: HelloComponent },
-    { path: '/HelloDecoratorComponent', name: 'HelloDecoratorComponent', component: HelloDecoratorComponent }
+    { path: '/HelloDecoratorComponent', name: 'HelloDecoratorComponent', component: HelloDecoratorComponent },
+    { path: '/Tutorial', name: 'Tutorial', component: Tutorial }
   ]
   
 
