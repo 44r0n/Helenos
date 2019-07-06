@@ -1,6 +1,11 @@
 <template>
     <div>
         <h1>{{message}}</h1>
+        <span v-bind:title="counterMessage">
+            Hover your mouse over me for a few seconds
+            to see my dynamically bound title!
+        </span>
+        
     </div>
 </template>
 
@@ -9,6 +14,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 @Component
 export default class Tutorial extends Vue {
 	message: string = 'Hello Vue!';
+    counterMessage: string = 'You loaded this page on ' + new Date().toLocaleString();
 }
 </script>
 
