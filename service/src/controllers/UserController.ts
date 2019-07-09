@@ -79,13 +79,12 @@ export class UserController {
         try {
             const errors: string[] = this.checkUserRequest(req.body);
             if (errors.length !== 0) {
-                res.status(400).json({ message: errors.toString()});
-                return;
+                return res.status(400).json({ message: errors.toString()});
             }
 
             const foundUser = await this.repository.findOne({ UserName: req.body.UserName });
             if(foundUser === null || foundUser === undefined) {
-                return false;
+                return res.status(401).json({ "message": "Invalid credentials" });
             }
 
             const success = await foundUser.ComparePassword(req.body.Password);
