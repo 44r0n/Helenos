@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>This is the public page</p>
+        <h1>This is the public page</h1>
     </div>
 </template>
 

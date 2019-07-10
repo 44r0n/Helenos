@@ -1,11 +1,30 @@
-<template>        
-    <ul>
-        <li><router-link to="/">Go to public page</router-link></li>
-        <li><router-link to="/Register">Go to register</router-link></li>
-        <li v-show="!registered"><router-link to="/Login">Go to login</router-link></li>
-        <li v-show="registered"><router-link to="/Logout">Go to logout</router-link></li>
-        <li v-show="registered"><router-link to="/Protected">Go to protected zone</router-link></li>            
-    </ul>
+<template>     
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a @click="toogle" role="button" class="navbar-burger burger" :class="activeClass" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class="navbar-menu" :class="activeClass">
+        <div class="navbar-start">
+            <router-link class="navbar-item" to="/">Public page</router-link>
+            <router-link class="navbar-item" to="/Protected" v-show="registered">Protedted zone</router-link>
+        </div>
+        
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <router-link class="button is-primary" to="/Register">Register</router-link>
+                    <router-link class="button is-light" to="/Login" v-show="!registered">Login</router-link>
+                    <router-link class="button is-light" to="/Logout" v-show="registered">Logout</router-link>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
 </template>
 
 <script lang="ts">
@@ -14,10 +33,17 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 @Component
 export default class MenuComponent extends Vue {
     registered = false;
+    activeClass = '';
 
     @Watch('$route')
     onRouteChanged() {
         this.registered = localStorage.getItem('siteUser') !== null;
+    }
+
+    toogle() {
+        console.log('toogle');
+        
+        this.activeClass = this.activeClass === '' ? 'is-active' : '';
     }
 }
 </script>
