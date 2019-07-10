@@ -1,6 +1,5 @@
 <template>
     <div>
-        <menu-component></menu-component>
         <input type="text" v-model="user.name" />
         <input type="password" v-model="user.password">
         <button :disabled=disableRegisterButton @click="register">Register</button>
@@ -12,9 +11,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import axios from 'axios';
-import MenuComponent from './MenuComponent.vue';
-
-Vue.component('menu-component', MenuComponent);
 
 @Component
 export default class RegisterComponent extends Vue {

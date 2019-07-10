@@ -1,6 +1,5 @@
 <template>
     <div>
-        <menu-component></menu-component>
         <h1>Protected zone</h1>
         <p>{{ message }}</p>
     </div>
@@ -10,9 +9,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import axios from 'axios';
 import router from '../router';
-import MenuComponent from './MenuComponent.vue';
-
-Vue.component('menu-component', MenuComponent);
 
 @Component
 export default class ProtectedComponent extends Vue {

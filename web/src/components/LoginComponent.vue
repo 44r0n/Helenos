@@ -1,8 +1,7 @@
 <template>
-    <div>
-        <menu-component></menu-component>
-        <input type="text" v-model="user.name" />
-        <input type="password" v-model="user.password">
+    <div>        
+        <input class="input" placeholder="User name" type="text" v-model="user.name" />
+        <input class="input" placeholder="Password" type="password" v-model="user.password">
         <button :disabled=disableLoginButton @click="login">Log in</button>
         <button @click="clear">Clear form</button>
         <p>{{ statusMessage }}</p>
@@ -13,9 +12,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import axios from 'axios';
 import router from '../router';
-import MenuComponent from './MenuComponent.vue';
-
-Vue.component('menu-component', MenuComponent);
 
 @Component
 export default class LoginComponent extends Vue {
@@ -37,6 +33,7 @@ export default class LoginComponent extends Vue {
                 Password: this.user.password
             });
             localStorage.setItem('siteUser', axiosResponse.data.Token);
+            this.$emit('userLogedIn');
             router.push('Protected');
         } 
         catch (error) {

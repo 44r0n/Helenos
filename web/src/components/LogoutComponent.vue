@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <menu-component></menu-component>
+    <div>        
         <p>Are you sure you want to log out?</p>
         <p>
             <button @click="logout">Yes</button>
@@ -12,14 +11,12 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import router from '../router';
-import MenuComponent from './MenuComponent.vue';
-
-Vue.component('menu-component', MenuComponent);
 
 @Component
 export default class LogoutComponent extends Vue {
     logout() {
         localStorage.removeItem('siteUser');
+        this.$emit('userLogedOut');
         router.push('/');
     }
 
