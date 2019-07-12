@@ -1,11 +1,48 @@
 <template>
-    <div>        
-        <input class="input" placeholder="User name" type="text" v-model="user.name" />
+    <div class="columns is-mobile">
+        <div class ="column is-three-fifths is-offset-one-fifth box">
+            <h1 class="title">Login</h1>
+            <div class="field">
+                <label for="userName" class="label">User name</label>                
+                <div class="control has-icons-left has-icons-right">
+                    <!-- <input class="input is-success" type="text" v-model="user.name" ref="userName" /> -->
+                    <input class="input" type="text" v-model="user.name" ref="userName" />
+                    <!-- TODO: comprobador de nombres según tecleas. Con WATCH -->
+                    <span class="icon is-small is-left" >
+                        <fa-icon :icon="['fas', 'user']" />
+                    </span>
+                    <!-- <span class="icon is-small is-right">
+                        <fa-icon :icon="['fas', 'check']" />
+                    </span> -->
+                </div>
+            </div>
+            <div class="field">
+                <label for="password" class="label">Password</label>
+                <div class="control has-icons-left">
+                    <input type="password" name="password" class="input" v-model="user.password">
+                    <span class="icon is-small is-left" >
+                        <fa-icon :icon="['fas', 'unlock-alt']" />
+                    </span>
+                </div>
+            </div>
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link" :disabled=disableLoginButton @click="login">Login</button>
+                </div>
+                <div class="control">
+                    <button class="button is-text" @click="clear">Clear form</button>
+                </div>
+            </div>            
+            <p class="help" :class="statusClass">{{ statusMessage }}</p>
+        </div>
+    </div>
+    <!-- <div>        
+        <input class="input" placeholder="User name" type="text"  />
         <input class="input" placeholder="Password" type="password" v-model="user.password">
-        <button :disabled=disableLoginButton @click="login">Log in</button>
+        <button >Log in</button>
         <button @click="clear">Clear form</button>
         <p>{{ statusMessage }}</p>
-    </div>
+    </div> -->
 </template>
 
 <script lang="ts">

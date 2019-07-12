@@ -53,17 +53,11 @@ export class UserController {
 
     public async Register(req: Request, res: Response) {
         try {
-            const errors: string[] = this.checkUserRequest(req.body);
+            const errors: string[] = await this.checkUserRequest(req.body);
             if (errors.length !== 0) {
                 res.status(400).json({ message: errors.toString()});
                 return;
             }
-            
-            if (await this.repository.findOne({ UserName: req.body.UserName }) !== undefined){
-                res.status(400).json({ message: 'User name already in use'});
-                return;
-            }
-
 
             const user = this.repository.create(req.body as User);
             await this.repository.save(user);
@@ -77,7 +71,7 @@ export class UserController {
 
     public async Login(req: Request, res: Response) {
         try {
-            const errors: string[] = this.checkUserRequest(req.body);
+            const errors: string[] = await this.checkUndefinedUserRequest(req.body);
             if (errors.length !== 0) {
                 return res.status(400).json({ message: errors.toString()});
             }
@@ -99,10 +93,30 @@ export class UserController {
         }
 	}
 
-    private checkUserRequest = (body: any): string[] => {
+    private async checkUserRequest (body: any): Promise<string[]> {
         const errors: string[] = [];
+        this.checkUndefinedUserRequest(body).forEach((error) => errors.push(error));        
+
+        if (body.UserName !== undefined && (body.UserName as string).length < 4) {
+            errors.push('User name must have at least 4 characters.');
+        }
+
+        if(body.Password !== undefined && (body.Password as string).length < 8) {
+            errors.push('Password must have at least 8 characters.');
+        }
+
+        if (await this.repository.findOne({ UserName: body.UserName }) !== undefined){
+            errors.push('User name already in use');            
+        }
+
+        return errors;
+    }
+
+    private checkUndefinedUserRequest (body: any): string[] {
+        const errors: string[] = [];
+
         if (body.UserName === undefined) {
-            errors.push('UserName cannot be empty');
+            errors.push('User nsame cannot be empty');
         }
 
         if(body.Password === undefined) {

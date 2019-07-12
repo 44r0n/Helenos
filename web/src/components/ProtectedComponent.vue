@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h1>Protected zone</h1>
+    <div class="container">
+        <h1 class="title">Protected zone</h1>
         <p>{{ message }}</p>
     </div>
 </template>
