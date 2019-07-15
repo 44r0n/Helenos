@@ -91,7 +91,21 @@ export class UserController {
             console.error(`Error loging in: ${error}`);
             return res.status(500);
         }
-	}
+    }
+    
+    public async UserNameAvailable(req: Request, res: Response) {
+        const errors: string[] = await this.checkUndefinedUserRequest(req.body);
+        if (errors.length !== 0) {
+            return res.status(400).json({ message: errors.toString()});
+        }
+
+        const foundUser = await this.repository.findOne({ UserName: req.body.UserName });
+        if (foundUser === null || foundUser === undefined) {
+            return res.status(200).json({ available: true });
+        }
+
+        return res.status(200).json({ available: false });
+    }
 
     private async checkUserRequest (body: any): Promise<string[]> {
         const errors: string[] = [];

@@ -18,6 +18,11 @@ createConnection().then(connection => {
             userController.Login(req,res);
         });
 
+    router.route("/userNameAvailable")
+        .post((req: Request, res: Response) => {
+            userController.UserNameAvailable(req,res);
+        });
+
 }).catch(err => console.error(`Could not create connection for users: ${err}`));
 
 export default router;

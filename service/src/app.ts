@@ -21,7 +21,7 @@ class App {
 		this.App.use(bodyParser.json());
 		this.App.use(bodyParser.urlencoded({ extended: false }));
 		this.App.use(async (req, res, next) => {
-			console.log(`${new Date().toLocaleDateString()} - ${req.method}: ${req.url}`);
+			console.log(`${this.nowToString()} - ${req.method}: ${req.url}`);
 			await this.authorizeRequest(req, res, next); // This will call next
 		});
 
@@ -33,6 +33,17 @@ class App {
 			res.status(404).json({ "error": "Endpoint not found" });
 			next();
 		});		
+	}
+
+	private nowToString(): string {
+		const date = new Date();
+		const day = date.getDate();
+		const monthIndex = date.getMonth();
+		const year = date.getFullYear();
+		const minutes = date.getMinutes();
+		const hours = date.getHours();
+		const seconds = date.getSeconds();
+		return day+"/"+(monthIndex+1)+"/"+year+" "+ hours+":"+minutes+":"+seconds;
 	}
 
 	private async authorizeRequest(req: Request, res: Response, next: NextFunction) {
