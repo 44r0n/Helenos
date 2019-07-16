@@ -2,29 +2,19 @@
     <div class="columns is-mobile">        
         <div class ="column is-three-fifths is-offset-one-fifth box">
             <h1 class="title">Register</h1>    
-            <input-text :labelText='"Textlabel"' v-model="user.name" />
-            <p>UserName: {{ user.name }}</p>
-            <div class="field">
-                <label for="userName" class="label">User name</label>                
-                <div class="control has-icons-left has-icons-right">
-                    <input class="input" :class="userNameInputClassStatus" type="text" v-model="user.name" ref="userName" />
-                    <!-- TODO: comprobador de nombres según tecleas. Con WATCH -->
-                    <span class="icon is-small is-left" >
-                        <fa-icon :icon="['fas', 'user']" />
-                    </span>
-                    <span class="icon is-small is-right">
-                        <fa-icon v-if="userNameLoad" :icon="['fas', 'spinner']"  spin/>
-                        <fa-icon v-if="userNameError" :icon="['fas', 'excalamation']" />
-                        <fa-icon v-if="userNameOk" :icon="['fas', 'check']" />
-                    </span>
-                </div>
-                <p class="help" :class="emptyStatusClass" >
-                    <fa-icon v-if="!loading" :icon="['fas', emptyHelperTextIcon ]" />
-                    <fa-icon v-if="loading" :icon="['fas', 'spinner' ]" spin />
-                    The user name cannot be empty</p>
-                <!-- <p class="help" :class="statusClass" ><fa-icon :icon="['fas', helperTextIcon ]" /> The user name must have at least 4 characters</p>
-                <p class="help" :class="statusClass" ><fa-icon :icon="['fas', helperTextIcon ]" /> The user name must be unique</p> -->
-            </div>
+            <input-text 
+                :labelText='"User name:"' 
+                :inputClass="userNameInputClassStatus" 
+                :leftIcon="userIcon" 
+                :rightIcon="userRightIcon"
+                :rightIconSpin="userLoading"
+                v-model="user.name" />
+            <status-message :status="emptyStatus">
+                The user name cannot be empty.
+            </status-message>
+            <status-message :status="fourCharactersUserStatus">
+                The user name must have at least 4 characters.
+            </status-message>                    
             <div class="field">
                 <label for="password" class="label">Password</label>
                 <div class="control has-icons-left">
@@ -42,7 +32,6 @@
                     <button class="button is-text" @click="clear">Clear form</button>
                 </div>
             </div>            
-            <p class="help" :class="statusClass">{{ statusMessage }}</p>
         </div>
     </div>
 </template>
@@ -51,32 +40,30 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import _ from "lodash";
 import axios from 'axios';
-import { library } from '@fortawesome/fontawesome-svg-core';
+import { library, IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUser, faCheck, faUnlockAlt, faSpinner, faExclamation, faInfo } from '@fortawesome/free-solid-svg-icons';
 import inputText from './utils/inputText.vue';
+import statusMessage from './utils/statusMessage.vue';
+import status from './utils/status';
 
 library.add(faUser, faCheck, faUnlockAlt, faSpinner, faExclamation, faInfo);
 
 Vue.component('fa-icon', FontAwesomeIcon);
 Vue.component('input-text', inputText);
+Vue.component('status-message', statusMessage);
 
 @Component
 export default class RegisterComponent extends Vue {
     user: { name: string, password: string } = { name: "", password: ""};
-    disableRegisterButton = false;
-    statusMessage = '';
-    statusClass = 'is-info';
-    emptyStatusClass = 'is-info';
-    userNameClass = '';
-    userNameLoad = false;
-    userNameOk = false;
-    userNameError = false;
-    helperTextIcon = 'info';
-    emptyHelperTextIcon = 'info';
-    userNameInputClassStatus = '';
-    loading = false;
+    disableRegisterButton = true;            
+    userNameInputClassStatus = 'is-info';
+    userLoading = false;
+    emptyStatus: status = 'info';    
+    fourCharactersUserStatus: status = 'info';
     debouncedGetAvailableUser: (() => Promise<void>) & _.Cancelable;
+    userIcon = faUser;
+    userRightIcon?: IconDefinition = undefined;
 
     @Watch('user.name')
     onUserNameChanged(val: string, oldValue: string) {        
@@ -84,8 +71,10 @@ export default class RegisterComponent extends Vue {
         //     this.helperTextIcon = 'exclamation';
         //     this.statusClass = 'is-danger';
         // }
-        this.emptyStatusClass = 'is-dark';
-        this.loading = true;
+        this.userLoading = true;
+        this.userRightIcon = faSpinner;
+        this.emptyStatus = 'load';        
+        this.fourCharactersUserStatus = 'load';
         this.debouncedGetAvailableUser();
     }    
 
@@ -94,18 +83,27 @@ export default class RegisterComponent extends Vue {
     }
 
     async getAvailableUser() {
-        if (this.user.name.length === 0) {
-            this.emptyStatusClass = 'is-danger';
-            this.emptyHelperTextIcon = 'exclamation';
-            this.userNameInputClassStatus = 'is-danger';
+        if (this.user.name.length === 0) {  
+            this.setUserInput('is-danger', faExclamation);
+            this.emptyStatus = 'error';                  
+            this.fourCharactersUserStatus = 'error';
+        } else if (this.user.name.length < 4) {
+            this.setUserInput('is-danger', faExclamation);
+            this.emptyStatus = 'ok';                   
+            this.fourCharactersUserStatus = 'error';
         }
-        else {
-            this.emptyStatusClass = 'is-info';
-            this.emptyHelperTextIcon = 'info';
-            this.userNameInputClassStatus = '';
+        else {         
+            this.setUserInput('is-success', faCheck);
+            this.emptyStatus = 'ok';
+            this.fourCharactersUserStatus = 'ok';
         }
 
-        this.loading = false;
+        this.userLoading = false;        
+    }
+
+    private setUserInput(className: string, icon: IconDefinition) {
+        this.userNameInputClassStatus = className;
+        this.userRightIcon = icon;
     }
 
     clear() {
@@ -115,44 +113,20 @@ export default class RegisterComponent extends Vue {
     }
 
     async register() {
-        this.disableRegisterButton = true;
-        this.statusMessage = 'Registering';             
-        this.setUserNameLoad();
+        this.disableRegisterButton = true;                    
 
         try {
             const axiosResponse = await axios.post('http://localhost:3000/api/v1/user/register', {
                 UserName: this.user.name,
                 Password: this.user.password
             });
-            this.statusMessage = `Your new user id is ${axiosResponse.data.user}`;
-            this.statusClass = 'is-success';
-            this.clear();
-            this.setUserNameOk(); // TODO: move to when verifies the userName availability
+            console.log(`Your new user id is ${axiosResponse.data.user}`);
+            this.clear();            
         }
         catch(error) {
-            this.statusMessage = error.response.data.message;
-            this.statusClass = 'is-danger';
-            this.setUserNameError(); // TODO: move to when verifies the userName availabitiliy
+            console.error(error.response.data.message);                        
         }
         this.disableRegisterButton = false;
-    }
-
-    private setUserNameLoad() {
-        this.userNameLoad = true;
-        this.userNameError = false;
-        this.userNameOk = false;
-    }
-
-    private setUserNameOk() {
-        this.userNameLoad = false;
-        this.userNameError = false;
-        this.userNameOk = true;
-    }
-
-    private setUserNameError() {
-        this.userNameLoad = false;
-        this.userNameError = true;
-        this.userNameOk = false;
     }
 }
 </script>

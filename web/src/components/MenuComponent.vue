@@ -48,8 +48,6 @@ export default class MenuComponent extends Vue {
     }
 
     toogle() {
-        console.log('toogle');
-        
         this.activeClass = this.activeClass === '' ? 'is-active' : '';
     }
 }
