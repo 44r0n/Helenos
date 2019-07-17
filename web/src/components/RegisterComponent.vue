@@ -1,14 +1,14 @@
 <template>
     <div class="columns is-mobile">        
         <div class ="column is-three-fifths is-offset-one-fifth box">
-            <h1 class="title">Register</h1>    
-            <input-text 
-                :labelText='"User name:"' 
-                :inputClass="userNameInputClassStatus" 
-                :leftIcon="userIcon" 
-                :rightIcon="userRightIcon"
-                :rightIconSpin="userLoading"
-                v-model="user.name" />
+            <h1 class="title">Register</h1>   
+            <status-input
+                labelText='User name:'
+                :leftIcon="userIcon"
+                :status="inputUserNameStatus"   
+                type='text'             
+                v-model="user.name"
+             />             
             <status-message :status="emptyStatus">
                 The user name cannot be empty.
             </status-message>
@@ -43,38 +43,35 @@ import axios from 'axios';
 import { library, IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUser, faCheck, faUnlockAlt, faSpinner, faExclamation, faInfo } from '@fortawesome/free-solid-svg-icons';
-import inputText from './utils/inputText.vue';
-import statusMessage from './utils/statusMessage.vue';
-import status from './utils/status';
+import status from './statusComponents/status';
+import statusMessage from './statusComponents/statusMessage.vue';
+import statusInput from './statusComponents/statusInput.vue';
 
-library.add(faUser, faCheck, faUnlockAlt, faSpinner, faExclamation, faInfo);
+library.add(faUser, faUnlockAlt);
 
 Vue.component('fa-icon', FontAwesomeIcon);
-Vue.component('input-text', inputText);
 Vue.component('status-message', statusMessage);
+Vue.component('status-input', statusInput);
 
 @Component
 export default class RegisterComponent extends Vue {
     user: { name: string, password: string } = { name: "", password: ""};
-    disableRegisterButton = true;            
-    userNameInputClassStatus = 'is-info';
-    userLoading = false;
+    disableRegisterButton = true;                    
+    inputUserNameStatus: status = 'info';
     emptyStatus: status = 'info';    
     fourCharactersUserStatus: status = 'info';
     debouncedGetAvailableUser: (() => Promise<void>) & _.Cancelable;
-    userIcon = faUser;
-    userRightIcon?: IconDefinition = undefined;
+    userIcon = faUser;    
 
     @Watch('user.name')
     onUserNameChanged(val: string, oldValue: string) {        
         // if(val.length === 0) {
         //     this.helperTextIcon = 'exclamation';
         //     this.statusClass = 'is-danger';
-        // }
-        this.userLoading = true;
-        this.userRightIcon = faSpinner;
+        // }               
         this.emptyStatus = 'load';        
         this.fourCharactersUserStatus = 'load';
+        this.inputUserNameStatus = 'load';
         this.debouncedGetAvailableUser();
     }    
 
@@ -84,26 +81,19 @@ export default class RegisterComponent extends Vue {
 
     async getAvailableUser() {
         if (this.user.name.length === 0) {  
-            this.setUserInput('is-danger', faExclamation);
             this.emptyStatus = 'error';                  
             this.fourCharactersUserStatus = 'error';
-        } else if (this.user.name.length < 4) {
-            this.setUserInput('is-danger', faExclamation);
+            this.inputUserNameStatus = 'error';
+        } else if (this.user.name.length < 4) {            
             this.emptyStatus = 'ok';                   
             this.fourCharactersUserStatus = 'error';
+            this.inputUserNameStatus = 'error';
         }
         else {         
-            this.setUserInput('is-success', faCheck);
             this.emptyStatus = 'ok';
             this.fourCharactersUserStatus = 'ok';
-        }
-
-        this.userLoading = false;        
-    }
-
-    private setUserInput(className: string, icon: IconDefinition) {
-        this.userNameInputClassStatus = className;
-        this.userRightIcon = icon;
+            this.inputUserNameStatus = 'ok';
+        }               
     }
 
     clear() {

@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCheck, faSpinner, faExclamation, faInfo } from '@fortawesome/free-solid-svg-icons';
 import status from './status';
 
+library.add(faCheck, faSpinner, faExclamation, faInfo);
+
 @Component
 export default class StatusMessage extends Vue {   
     @Prop() status: status;    
