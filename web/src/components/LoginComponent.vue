@@ -3,7 +3,7 @@
         <div class ="column is-three-fifths is-offset-one-fifth box">
             <h1 class="title">Login</h1>
             <div class="field">
-                <label for="userName" class="label">User name</label>                
+                <label for="userName" class="label is-normal">User name</label>                
                 <div class="control has-icons-left has-icons-right">
                     <!-- <input class="input is-success" type="text" v-model="user.name" ref="userName" /> -->
                     <input class="input" type="text" v-model="user.name" ref="userName" />

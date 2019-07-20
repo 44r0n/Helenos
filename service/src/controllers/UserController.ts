@@ -115,6 +115,10 @@ export class UserController {
             errors.push('User name must have at least 4 characters.');
         }
 
+        if(body.Password === undefined) {
+            errors.push('Password cannot be emty');
+        }
+
         if(body.Password !== undefined && (body.Password as string).length < 8) {
             errors.push('Password must have at least 8 characters.');
         }
@@ -131,11 +135,7 @@ export class UserController {
 
         if (body.UserName === undefined) {
             errors.push('User nsame cannot be empty');
-        }
-
-        if(body.Password === undefined) {
-            errors.push('Password cannot be emty');
-        }
+        }       
 
         return errors;
     }

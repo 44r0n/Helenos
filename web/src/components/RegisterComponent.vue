@@ -4,33 +4,38 @@
             <h1 class="title">Register</h1>   
             <status-input
                 labelText='User name:'
-                :leftIcon="userIcon"
-                :status="inputUserNameStatus"   
+                :leftIcon='userIcon'
+                :status='inputUserNameStatus'   
                 type='text'             
-                v-model="user.name"
+                v-model='user.name'
              />             
-            <status-message :status="emptyStatus">
-                The user name cannot be empty.
-            </status-message>
-            <status-message :status="fourCharactersUserStatus">
-                The user name must have at least 4 characters.
-            </status-message>                    
-            <div class="field">
-                <label for="password" class="label">Password</label>
-                <div class="control has-icons-left">
-                    <input type="password" name="password" class="input" v-model="user.password">
-                    <span class="icon is-small is-left" >
-                        <fa-icon :icon="['fas', 'unlock-alt']" />
-                    </span>
-                </div>
-            </div>
-            <div class="field is-grouped">
-                <div class="control">
-                    <button class="button is-link" :disabled=disableRegisterButton @click="register">Register</button>
-                </div>
-                <div class="control">
-                    <button class="button is-text" @click="clear">Clear form</button>
-                </div>
+            <status-message :status="emptyStatus">The user name cannot be empty.</status-message>
+            <status-message :status="fourCharactersUserStatus">The user name must have at least 4 characters.</status-message>    
+            <status-message :status="uniqueUserStatus">The user name bust be unique.</status-message>                
+            <status-input 
+                type='password'
+                labelText='Password:'
+                :leftIcon='passwordIcon'
+                :status='inputPasswordStatus'
+                v-model='user.password'
+            />
+            <status-input 
+                type='password'
+                labelText='Repeat password:'
+                :leftIcon='passwordIcon'
+                :status='inputPasswordStatus'
+                v-model='user.repeatPassword'
+            />
+            <status-message :status='emptyPasswordStatus'>The password cannot be empty.</status-message>
+            <status-message :status='eightCharactersPasswordStatus'>The password must contain at least 8 characters.</status-message>
+            <status-message :status='equalPasswordStatus'>The two passwods must match</status-message>
+            <div class="field is-grouped is-grouped-right">
+                <p class="control">
+                    <button class="button is-link" :class="loadingClass" :disabled=disableRegisterButton @click="register">Register</button>
+                </p>
+                <p class="control">
+                    <button class="button is-dark is-outlined" @click="clear">Clear form</button>
+                </p>
             </div>            
         </div>
     </div>
@@ -55,55 +60,155 @@ Vue.component('status-input', statusInput);
 
 @Component
 export default class RegisterComponent extends Vue {
-    user: { name: string, password: string } = { name: "", password: ""};
-    disableRegisterButton = true;                    
+    user = { name: "", password: "", repeatPassword: ""};
+    loadingClass = '';                 
     inputUserNameStatus: status = 'info';
     emptyStatus: status = 'info';    
     fourCharactersUserStatus: status = 'info';
+    uniqueUserStatus: status = 'info';
     debouncedGetAvailableUser: (() => Promise<void>) & _.Cancelable;
-    userIcon = faUser;    
+    userIcon = faUser;
+
+    passwordIcon = faUnlockAlt;
+    inputPasswordStatus: status = 'info';
+    emptyPasswordStatus: status = 'info';
+    eightCharactersPasswordStatus: status = 'info';
+    equalPasswordStatus: status = 'info';
+    debouncedCheckPassword: (() => Promise<void>) & _.Cancelable;
+
+    clearingUserName = false;    
+    clearingPassword = false;
+    clearingRepeatPassword = false;
 
     @Watch('user.name')
-    onUserNameChanged(val: string, oldValue: string) {        
-        // if(val.length === 0) {
-        //     this.helperTextIcon = 'exclamation';
-        //     this.statusClass = 'is-danger';
-        // }               
-        this.emptyStatus = 'load';        
-        this.fourCharactersUserStatus = 'load';
-        this.inputUserNameStatus = 'load';
-        this.debouncedGetAvailableUser();
+    onUserNameChanged(val: string, oldValue: string) {  
+        if(this.clearingUserName === false) {                  
+            this.emptyStatus = 'load';        
+            this.fourCharactersUserStatus = 'load';
+            this.inputUserNameStatus = 'load';
+            this.uniqueUserStatus = 'load';
+            this.debouncedGetAvailableUser();
+        } else {
+            this.clearingUserName = false;
+        }
     }    
 
-    created() {
-        this.debouncedGetAvailableUser = _.debounce(this.getAvailableUser, 500);
+    @Watch('user.password')
+    onPasswordChanged(val: string, oldValue: string) {
+        if(this.clearingPassword === false) {
+            this.setLoadPassword();
+        } else {
+            this.clearingPassword = true;
+        }
     }
 
-    async getAvailableUser() {
+    @Watch('user.repeatPassword')
+    onRepeatPasswordChange(val: string, oldValue: string) {
+        if(this.clearingRepeatPassword === false) {
+            this.setLoadPassword();
+        } else {
+            this.clearingRepeatPassword = true;
+        }
+    }
+
+    private setLoadPassword() {
+        this.inputPasswordStatus = 'load';
+        this.emptyPasswordStatus = 'load';
+        this.eightCharactersPasswordStatus = 'load';
+        this.equalPasswordStatus = 'load';
+        this.debouncedCheckPassword();
+    }
+
+    created() {
+        this.debouncedGetAvailableUser = _.debounce(this.checkUser, 500);
+        this.debouncedCheckPassword = _.debounce(this.checkPassword, 500);
+    }
+
+    async checkUser() {        
         if (this.user.name.length === 0) {  
             this.emptyStatus = 'error';                  
             this.fourCharactersUserStatus = 'error';
             this.inputUserNameStatus = 'error';
+            this.uniqueUserStatus = 'error';
         } else if (this.user.name.length < 4) {            
             this.emptyStatus = 'ok';                   
             this.fourCharactersUserStatus = 'error';
             this.inputUserNameStatus = 'error';
+            this.uniqueUserStatus = 'error';            
+        } else if (!await this.checkAvailableUser(this.user.name)) {
+            this.emptyStatus = 'ok';
+            this.fourCharactersUserStatus = 'ok';
+            this.inputUserNameStatus = 'error';
+            this.uniqueUserStatus = 'error';            
         }
         else {         
             this.emptyStatus = 'ok';
             this.fourCharactersUserStatus = 'ok';
             this.inputUserNameStatus = 'ok';
-        }               
+            this.uniqueUserStatus = 'ok';            
+        }                       
+    }
+
+    async checkPassword() {
+        if(this.user.password.length === 0) {
+            this.emptyPasswordStatus = 'error';
+            this.eightCharactersPasswordStatus = 'error';
+            this.equalPasswordStatus = 'error';
+            this.inputPasswordStatus = 'error';
+        } else if (this.user.password.length < 8 ) {
+            this.emptyPasswordStatus = 'ok';
+            this.eightCharactersPasswordStatus = 'error';
+            this.equalPasswordStatus = 'error';
+            this.inputPasswordStatus = 'error';
+        } else if (this.user.password !== this.user.repeatPassword) {
+            this.emptyPasswordStatus = 'ok';
+            this.eightCharactersPasswordStatus = 'ok';
+            this.equalPasswordStatus = 'error';
+            this.inputPasswordStatus = 'error';
+        } else {
+            this.emptyPasswordStatus = 'ok';
+            this.eightCharactersPasswordStatus = 'ok';
+            this.equalPasswordStatus = 'ok';
+            this.inputPasswordStatus = 'ok';
+        }
+    }
+
+    private async checkAvailableUser(userName: string): Promise<boolean> {
+        try {
+            const axiosResponse = await axios.post('http://localhost:3000/api/v1/user/userNameAvailable', {
+                UserName: userName
+            });
+            return axiosResponse.data.available;
+        }
+        catch(error) {
+            console.error(error.response.data.message);
+            return false;
+        }
     }
 
     clear() {
-        this.user = { name: "", password: ""};
-        this.disableRegisterButton = false;
-        (this.$refs.userName as HTMLElement).focus();   
+        this.user.name = "";
+        this.user.password = "";
+        this.user.repeatPassword = "";
+        this.emptyStatus = 'info';                  
+        this.fourCharactersUserStatus = 'info';
+        this.inputUserNameStatus = 'info';
+        this.uniqueUserStatus = 'info';   
+        this.emptyPasswordStatus = 'info';
+        this.eightCharactersPasswordStatus = 'info';
+        this.equalPasswordStatus = 'info';
+        this.inputPasswordStatus = 'info';    
+        this.clearingUserName = true;
+        this.clearingPassword = true;
+        this.clearingRepeatPassword = true;
     }
 
-    async register() {
-        this.disableRegisterButton = true;                    
+    get disableRegisterButton(): boolean {        
+        return (this.inputUserNameStatus !== 'ok' || this.inputPasswordStatus !== 'ok');
+    }
+
+    async register() {        
+        this.loadingClass = 'is-loading';           
 
         try {
             const axiosResponse = await axios.post('http://localhost:3000/api/v1/user/register', {
@@ -111,12 +216,13 @@ export default class RegisterComponent extends Vue {
                 Password: this.user.password
             });
             console.log(`Your new user id is ${axiosResponse.data.user}`);
-            this.clear();            
+            this.clear();                                 
         }
         catch(error) {
-            console.error(error.response.data.message);                        
+            console.error(error.response.data.message);                                    
         }
-        this.disableRegisterButton = false;
+
+        this.loadingClass = ''; 
     }
 }
 </script>

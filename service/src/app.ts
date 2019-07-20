@@ -51,6 +51,7 @@ class App {
 		const userController = new UserController(connection.getRepository(User));
 		if (req.path.includes(baseUrl + "/user/login")) { return next(); }
 		if (req.path.includes(baseUrl + "/user/register")) { return next(); }
+		if (req.path.includes(baseUrl + "/user/userNameAvailable")) { return next(); }
 		return await userController.Authenticate(req, res, next);
 	}
 }
