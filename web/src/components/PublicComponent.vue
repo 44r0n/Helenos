@@ -1,9 +1,7 @@
 <template>
-    <div class="columns is-mobile">
-        <div class ="column is-three-fifths is-offset-one-fifth">
-            <font-awesome-icon :icon="['fab','galactic-republic']" size="10x" />
-            <h1>This is the public page</h1>
-        </div>
+    <div class="container">   
+        <font-awesome-icon :icon="['fab','galactic-republic']" size="10x" />
+        <h1>This is the public page</h1>    
     </div>
 </template>
 

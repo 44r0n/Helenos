@@ -36,7 +36,8 @@
                 <p class="control">
                     <button class="button is-dark is-outlined" @click="clear">Clear form</button>
                 </p>
-            </div>            
+            </div>  
+            <p class="content is-large">{{ newUserId }}</p>                
         </div>
     </div>
 </template>
@@ -79,6 +80,8 @@ export default class RegisterComponent extends Vue {
     clearingUserName = false;    
     clearingPassword = false;
     clearingRepeatPassword = false;
+
+    newUserId = '';
 
     @Watch('user.name')
     onUserNameChanged(val: string, oldValue: string) {  
@@ -215,6 +218,7 @@ export default class RegisterComponent extends Vue {
                 UserName: this.user.name,
                 Password: this.user.password
             });
+            this.newUserId = `Your new iser id is:  ${axiosResponse.data.user}`;
             console.log(`Your new user id is ${axiosResponse.data.user}`);
             this.clear();                                 
         }
