@@ -1,5 +1,13 @@
 version: '3'
 services:
+  web:
+    build: ./web
+    ports:
+      - "80:80"
+    environment:
+      DEPLOY_ENV: ${DEPLOY_ENV}
+    volumes:
+      - ./web:/usr/src/app
   webservice:
     build: ./service
     ports:
