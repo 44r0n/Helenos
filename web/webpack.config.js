@@ -57,7 +57,8 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true
+    noInfo: false,
+    port: 4000
   },
   plugins: [
     new VueLoaderPlugin()

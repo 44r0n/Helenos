@@ -3,9 +3,7 @@ services:
   web:
     build: ./web
     ports:
-      - "80:80"
-    environment:
-      DEPLOY_ENV: ${DEPLOY_ENV}
+      - "4000:4000"
     volumes:
       - ./web:/usr/src/app
   webservice:
