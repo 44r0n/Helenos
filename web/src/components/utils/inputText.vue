@@ -31,8 +31,6 @@ export default class InputText extends Vue {
         const leftIconClass = this.leftIcon !== undefined ? 'has-icons-left' : '';
         const rightIconClass = this.rightIcon !== undefined ? 'has-icons-right' : '';
         return leftIconClass + ' ' + rightIconClass;
-    }
-
-    //TODO: sustituir por 4 estados: info, error, ok, load en un componente nuevo
+    }    
 }
 </script>
