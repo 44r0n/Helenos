@@ -1,15 +1,13 @@
-<template>
-    <div>
-        <input-text 
-            :labelText='labelText'
-            :inputClass='inputClassStatus'                   
-            :leftIcon='leftIcon'                 
-            :rightIcon='rightIcon'
-            :rightIconSpin='rightIconSpin'
-            :type='type'             
-            v-model='inputValue'                 
-        />
-    </div>
+<template>    
+    <input-text 
+        :labelText='labelText'
+        :inputClass='inputClassStatus'                   
+        :leftIcon='leftIcon'                 
+        :rightIcon='rightIcon'
+        :rightIconSpin='rightIconSpin'
+        :type='type'             
+        v-model='inputValue'                 
+    />    
 </template>
 
 <script lang='ts'>
